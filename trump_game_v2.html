@@ -24,6 +24,11 @@
 
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
+html, body {
+  background: var(--dark) !important;
+  background-color: var(--dark) !important;
+}
+
 body {
   background: var(--dark);
   color: var(--gold-light);
@@ -39,10 +44,10 @@ body {
 
 /* PC対応 */
 @media (min-width: 600px) {
-  #startScreen, #gameScreen { max-width: 760px; width: 100%; }
   .controls .ctrl { font-size: 22px; padding: 16px 8px; }
   .ctrl.drop-btn { font-size: 16px; padding: 14px; }
   .battle-area { gap: 10px; }
+  .attack-count { font-size: 16px; }
 }
 
 /* ===== START SCREEN ===== */
@@ -52,6 +57,7 @@ body {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   padding: 24px;
   background-image: radial-gradient(ellipse at 50% 30%, rgba(201,168,76,0.06) 0%, transparent 70%);
+  overflow-y: auto;
 }
 
 .start-logo {
@@ -211,8 +217,13 @@ body {
 }
 
 /* ===== GAME SCREEN ===== */
-#gameScreen { display: none; width: 100%; max-width: 420px; padding: 8px; }
+#gameScreen { display: none; width: 100%; max-width: 420px; padding: 8px; margin: 0 auto; }
 #gameScreen.show { display: block; }
+
+/* PC対応のgameScreen上書き */
+@media (min-width: 600px) {
+  #gameScreen { max-width: 700px; }
+}
 
 .game-header {
   display: flex; justify-content: space-between; align-items: center;
@@ -242,14 +253,16 @@ body {
 /* Battle area */
 .battle-area {
   display: flex; gap: 6px; margin-bottom: 10px;
+  width: 100%; overflow: hidden;
 }
 
 .board-panel {
   flex: 1; display: flex; flex-direction: column; align-items: center;
+  min-width: 0;
 }
 
 .panel-header {
-  display: flex; justify-content: space-between; align-items: center;
+  display: flex; justify-content: flex-end; align-items: center;
   width: 100%; margin-bottom: 6px; padding: 0 2px;
 }
 
@@ -317,7 +330,7 @@ canvas { display: block; }
   border: 1px solid rgba(201,168,76,0.1);
 }
 
-.gauge-item { flex: 1; }
+.gauge-item { flex: 1; display: flex; flex-direction: column; justify-content: center; }
 .gauge-label {
   font-size: 9px; letter-spacing: 1px;
   color: rgba(201,168,76,0.6);
@@ -382,8 +395,8 @@ canvas { display: block; }
 
 .attack-count {
   position: absolute; top: 2px; right: 4px;
-  font-size: 10px; font-family: 'Cinzel', serif;
-  color: #ff8080; font-weight: 700;
+  font-size: 14px; font-family: 'Cinzel', serif;
+  color: #ff8080; font-weight: 900;
 }
 
 .drop-row {
@@ -700,11 +713,13 @@ function showKuronyan() {
 
 // ========== CANVAS SETUP ==========
 function setupCanvas() {
-  // Responsive cell size - larger on PC
-  const screenW = Math.min(window.innerWidth, 800);
-  const boardW = (screenW - 48) / 2 - 16;
+  const gameScreen = document.getElementById('gameScreen');
+  const screenW = gameScreen.offsetWidth || Math.min(window.innerWidth, 760);
+  const padding = 16 * 2; // gameScreen padding
+  const vsWidth = 24 + 12; // VS divider + gap
+  const boardW = (screenW - padding - vsWidth) / 2 - 4;
   const dynamicCell = Math.floor(boardW / COLS);
-  window.DYNAMIC_CELL = Math.max(36, Math.min(dynamicCell, 56));
+  window.DYNAMIC_CELL = Math.max(30, Math.min(dynamicCell, 56));
   
   const W = COLS * window.DYNAMIC_CELL, H = ROWS * window.DYNAMIC_CELL;
   ['playerCanvas','kingCanvas'].forEach(id => {
@@ -1230,8 +1245,8 @@ function drawCard(ctx,x,y,card,active,cell=CELL) {
   }
   ctx.shadowBlur=0;
   
-  // Suit symbol (center)
-  ctx.font=`bold ${cell*0.42}px serif`;
+  // Suit symbol (center, larger)
+  ctx.font=`bold ${cell*0.55}px serif`;
   ctx.textAlign='center'; ctx.textBaseline='middle';
   if(isBirth&&active){ctx.shadowColor='rgba(255,220,80,0.9)';ctx.shadowBlur=12;}
   ctx.fillStyle=isJoker?'#c080ff':(isBirth?'#ffd850':color);
@@ -1239,13 +1254,13 @@ function drawCard(ctx,x,y,card,active,cell=CELL) {
   ctx.shadowBlur=0;
   
   // Number (large, overlapping suit is OK)
-  ctx.font=`bold ${cell*0.32}px 'Cinzel',serif`;
+  ctx.font=`bold ${cell*0.38}px 'Cinzel',serif`;
   ctx.textAlign='left'; ctx.textBaseline='top';
   ctx.fillStyle=isBirth?'#ffd850':(isJoker?'#c080ff':color);
-  ctx.strokeStyle='rgba(0,0,0,0.6)';
-  ctx.lineWidth=2;
-  ctx.strokeText(isJoker?'★':card.num,x+3,y+2);
-  ctx.fillText(isJoker?'★':card.num,x+3,y+2);
+  ctx.strokeStyle='rgba(0,0,0,0.7)';
+  ctx.lineWidth=2.5;
+  ctx.strokeText(isJoker?'★':card.num,x+2,y+1);
+  ctx.fillText(isJoker?'★':card.num,x+2,y+1);
 }
 
 function drawGhost(ctx,x,y,card,cell=CELL) {
