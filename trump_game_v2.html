@@ -183,7 +183,7 @@ body {
   border: 1px solid var(--gold-dim);
   border-radius: 20px;
   padding: 24px;
-  max-width: 340px; width: 100%;
+  max-width: 500px; width: 90%;
   max-height: 80vh; overflow-y: auto;
 }
 
@@ -691,7 +691,7 @@ const CELL = 28;
 function togglePause() {
   if (!gameRunning) return;
   paused = !paused;
-  document.getElementById('pauseBtn').textContent = paused ? '▶' : '⏸';
+  document.getElementById('pauseBtn').textContent = paused ? '▷' : '⏸';
   if (paused) {
     clearInterval(gameLoopTimer);
   } else {
@@ -712,9 +712,9 @@ function showKuronyan() {
 // ========== CANVAS SETUP ==========
 function setupCanvas() {
   const gameScreen = document.getElementById('gameScreen');
-  const screenW = gameScreen.offsetWidth || Math.min(window.innerWidth, 760);
-  const padding = 16 * 2; // gameScreen padding
-  const vsWidth = 24 + 12; // VS divider + gap
+  const screenW = Math.min(window.innerWidth, 700);
+  const padding = 16;
+  const vsWidth = 36;
   const boardW = (screenW - padding - vsWidth) / 2 - 4;
   const dynamicCell = Math.floor(boardW / COLS);
   window.DYNAMIC_CELL = Math.max(30, Math.min(dynamicCell, 56));
