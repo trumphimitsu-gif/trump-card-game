@@ -1120,9 +1120,6 @@ function updateAttackBtn() {
   document.getElementById('attackCount').textContent = attackStock;
   const btn = document.getElementById('btnAttack');
   btn.classList.toggle('ready', attackStock>0);
-  const jBtn = document.getElementById('btnJoker');
-  // Joker gauge shows fill progress, lights up when gauge is filling
-  jBtn.classList.toggle('ready', jokerGauge > 50);
 }
 
 function sendAttack() {
