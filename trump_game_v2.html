@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>トランプの秘密 - カードバトル</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@400;700&display=swap');
+
+:root {
+  --gold: #c9a84c;
+  --gold-light: #f0d080;
+  --gold-dim: rgba(201,168,76,0.4);
+  --dark: #080810;
+  --dark2: #10101a;
+  --dark3: #18182a;
+  --red: #e05050;
+  --white-suit: #e8e0d0;
+  --glow-gold: 0 0 20px rgba(201,168,76,0.6);
+  --cell: 36px;
+  --cols: 7;
+  --rows: 12;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  background: var(--dark);
+  color: var(--gold-light);
+  font-family: 'Noto Serif JP', serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  background-image: radial-gradient(ellipse at 30% 10%, rgba(201,168,76,0.04) 0%, transparent 60%),
+                    radial-gradient(ellipse at 70% 90%, rgba(80,60,160,0.04) 0%, transparent 60%);
+}
+
+/* ===== START SCREEN ===== */
+#startScreen {
+  position: fixed; inset: 0; z-index: 100;
+  background: var(--dark);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 24px;
+  background-image: radial-gradient(ellipse at 50% 30%, rgba(201,168,76,0.06) 0%, transparent 70%);
+}
+
+.start-logo {
+  font-family: 'Cinzel', serif;
+  font-size: 11px; letter-spacing: 6px;
+  color: rgba(201,168,76,0.5);
+  margin-bottom: 8px;
+}
+
+.start-title {
+  font-family: 'Cinzel', serif;
+  font-size: 26px; font-weight: 900;
+  color: var(--gold);
+  text-shadow: var(--glow-gold);
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.start-sub {
+  font-size: 12px; color: rgba(201,168,76,0.6);
+  letter-spacing: 2px; margin-bottom: 32px;
+}
+
+.cat-display {
+  font-size: 56px;
+  animation: float 3s ease-in-out infinite;
+  margin-bottom: 28px;
+  filter: drop-shadow(0 0 20px rgba(201,168,76,0.4));
+}
+
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+.birth-card {
+  background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(201,168,76,0.03));
+  border: 1px solid var(--gold-dim);
+  border-radius: 16px;
+  padding: 20px 24px;
+  width: 100%; max-width: 320px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.birth-label {
+  font-size: 10px; letter-spacing: 3px;
+  color: rgba(201,168,76,0.6);
+  margin-bottom: 14px;
+}
+
+.birth-row {
+  display: flex; gap: 10px; justify-content: center; align-items: center;
+  margin-bottom: 14px;
+}
+
+.birth-row input {
+  background: rgba(0,0,0,0.6);
+  border: 1px solid var(--gold-dim);
+  border-radius: 10px;
+  color: var(--gold-light);
+  font-family: 'Cinzel', serif;
+  font-size: 20px; text-align: center;
+  width: 72px; padding: 10px 6px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.birth-row input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(201,168,76,0.3);
+}
+
+.birth-sep { color: var(--gold); font-size: 22px; font-family: 'Cinzel', serif; }
+
+.birth-result {
+  display: none; padding: 10px; border-radius: 8px;
+  background: rgba(0,0,0,0.4); border: 1px solid rgba(201,168,76,0.2);
+}
+.birth-result.show { display: block; }
+.birth-result-card { font-family: 'Cinzel', serif; font-size: 18px; color: var(--gold); }
+.birth-result-desc { font-size: 11px; color: rgba(201,168,76,0.7); margin-top: 4px; }
+
+.btn-set-birth {
+  background: rgba(201,168,76,0.15);
+  border: 1px solid var(--gold-dim);
+  border-radius: 8px;
+  color: var(--gold-light);
+  font-size: 12px; padding: 8px 18px;
+  cursor: pointer; letter-spacing: 1px;
+  transition: all 0.2s;
+}
+.btn-set-birth:hover { background: rgba(201,168,76,0.25); }
+
+.btn-start {
+  background: linear-gradient(135deg, var(--gold), #8b6914);
+  border: none; border-radius: 14px;
+  color: var(--dark);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 16px; font-weight: 700;
+  padding: 16px 48px;
+  cursor: pointer; letter-spacing: 2px;
+  transition: all 0.3s;
+  box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+  width: 100%; max-width: 320px;
+}
+.btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,168,76,0.5); }
+
+.skip-link {
+  margin-top: 12px;
+  font-size: 11px; color: rgba(201,168,76,0.4);
+  cursor: pointer; text-decoration: underline;
+}
+
+/* ===== HOW TO PLAY OVERLAY ===== */
+#howToPlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.92);
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+#howToPlay.show { display: flex; }
+
+.htp-box {
+  background: var(--dark2);
+  border: 1px solid var(--gold-dim);
+  border-radius: 20px;
+  padding: 24px;
+  max-width: 340px; width: 100%;
+  max-height: 80vh; overflow-y: auto;
+}
+
+.htp-title {
+  font-family: 'Cinzel', serif;
+  font-size: 18px; color: var(--gold);
+  text-align: center; margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+
+.htp-section { margin-bottom: 16px; }
+.htp-section-title {
+  font-size: 11px; letter-spacing: 3px;
+  color: var(--gold); margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(201,168,76,0.2);
+}
+.htp-item {
+  font-size: 12px; color: rgba(240,208,128,0.85);
+  line-height: 1.8; padding-left: 12px;
+}
+.htp-item::before { content: '✦ '; color: var(--gold); }
+
+.htp-close {
+  background: linear-gradient(135deg, var(--gold), #8b6914);
+  border: none; border-radius: 10px;
+  color: var(--dark); font-weight: 700;
+  padding: 12px 32px; cursor: pointer;
+  width: 100%; margin-top: 8px;
+  font-size: 14px; letter-spacing: 1px;
+}
+
+/* ===== GAME SCREEN ===== */
+#gameScreen { display: none; width: 100%; max-width: 420px; padding: 8px; }
+#gameScreen.show { display: block; }
+
+.game-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 4px 10px;
+  border-bottom: 1px solid rgba(201,168,76,0.2);
+  margin-bottom: 10px;
+}
+
+.header-logo {
+  font-family: 'Cinzel', serif;
+  font-size: 14px; color: var(--gold);
+  letter-spacing: 1px;
+}
+
+.btn-help {
+  background: rgba(201,168,76,0.1);
+  border: 1px solid var(--gold-dim);
+  border-radius: 8px;
+  color: var(--gold); font-size: 16px;
+  width: 36px; height: 36px;
+  cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.btn-help:hover { background: rgba(201,168,76,0.2); }
+
+/* Battle area */
+.battle-area {
+  display: flex; gap: 6px; margin-bottom: 10px;
+}
+
+.board-panel {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+}
+
+.panel-header {
+  display: flex; justify-content: space-between; align-items: center;
+  width: 100%; margin-bottom: 6px; padding: 0 2px;
+}
+
+.panel-name {
+  font-size: 10px; letter-spacing: 2px;
+  color: rgba(201,168,76,0.7);
+}
+
+.panel-score {
+  font-family: 'Cinzel', serif;
+  font-size: 14px; color: var(--gold);
+}
+
+.board-container {
+  position: relative;
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(201,168,76,0.08), inset 0 0 20px rgba(0,0,0,0.5);
+}
+
+canvas { display: block; }
+
+.next-label {
+  font-size: 9px; letter-spacing: 2px;
+  color: rgba(201,168,76,0.5);
+  margin-top: 6px; margin-bottom: 4px;
+  text-align: center;
+}
+
+.next-preview {
+  display: flex; gap: 3px; justify-content: center;
+}
+
+.next-card-mini {
+  width: 24px; height: 28px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+}
+
+/* VS divider */
+.vs-divider {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  width: 24px;
+}
+
+.vs-text {
+  font-family: 'Cinzel', serif;
+  font-size: 11px; font-weight: 900;
+  color: rgba(201,168,76,0.5);
+  writing-mode: vertical-rl;
+  letter-spacing: 4px;
+}
+
+/* Gauge bars */
+.gauges {
+  display: flex; gap: 6px; margin-bottom: 10px;
+  padding: 10px 4px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 10px;
+  border: 1px solid rgba(201,168,76,0.1);
+}
+
+.gauge-item { flex: 1; }
+.gauge-label {
+  font-size: 9px; letter-spacing: 1px;
+  color: rgba(201,168,76,0.6);
+  margin-bottom: 4px; text-align: center;
+}
+
+.gauge-bar {
+  height: 8px; background: rgba(0,0,0,0.5);
+  border-radius: 4px; border: 1px solid rgba(201,168,76,0.2);
+  overflow: hidden;
+}
+
+.gauge-fill {
+  height: 100%; border-radius: 4px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.gauge-fill.joker { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+.gauge-fill.attack { background: linear-gradient(90deg, #e05050, #ff8080); }
+
+/* Controls */
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.ctrl {
+  background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.04));
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 10px;
+  color: var(--gold-light);
+  font-size: 18px; padding: 12px 6px;
+  cursor: pointer; text-align: center;
+  user-select: none; -webkit-user-select: none;
+  transition: all 0.12s;
+  position: relative;
+}
+
+.ctrl:active { background: rgba(201,168,76,0.25); transform: scale(0.94); }
+
+.ctrl.attack-btn {
+  background: linear-gradient(135deg, rgba(224,80,80,0.2), rgba(224,80,80,0.05));
+  border-color: rgba(224,80,80,0.4);
+}
+.ctrl.attack-btn.ready {
+  background: linear-gradient(135deg, rgba(224,80,80,0.4), rgba(224,80,80,0.15));
+  box-shadow: 0 0 12px rgba(224,80,80,0.4);
+  animation: pulse-red 1.5s ease-in-out infinite;
+}
+
+.ctrl.joker-btn.ready {
+  background: linear-gradient(135deg, rgba(201,168,76,0.4), rgba(201,168,76,0.15));
+  box-shadow: 0 0 12px rgba(201,168,76,0.5);
+  animation: pulse-gold 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-red { 0%,100%{box-shadow:0 0 12px rgba(224,80,80,0.4)} 50%{box-shadow:0 0 20px rgba(224,80,80,0.7)} }
+@keyframes pulse-gold { 0%,100%{box-shadow:0 0 12px rgba(201,168,76,0.4)} 50%{box-shadow:0 0 20px rgba(201,168,76,0.8)} }
+
+.attack-count {
+  position: absolute; top: 2px; right: 4px;
+  font-size: 10px; font-family: 'Cinzel', serif;
+  color: #ff8080; font-weight: 700;
+}
+
+.drop-row {
+  grid-column: span 5;
+}
+.ctrl.drop-btn {
+  font-size: 13px; letter-spacing: 2px;
+  padding: 10px;
+  font-family: 'Noto Serif JP', serif;
+}
+
+/* Overlays */
+.board-overlay {
+  display: none; position: absolute; inset: 0;
+  background: rgba(0,0,0,0.88);
+  flex-direction: column; align-items: center; justify-content: center;
+  z-index: 10; border-radius: 9px;
+}
+.board-overlay.show { display: flex; }
+
+.overlay-title {
+  font-family: 'Cinzel', serif;
+  font-size: 20px; color: var(--gold);
+  text-shadow: var(--glow-gold);
+  margin-bottom: 6px;
+}
+.overlay-sub { font-size: 11px; color: rgba(201,168,76,0.7); text-align: center; }
+
+/* Chain/combo popup */
+.chain-pop {
+  position: absolute; top: 40%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Cinzel', serif; font-size: 28px; font-weight: 900;
+  color: var(--gold); text-shadow: var(--glow-gold);
+  pointer-events: none; opacity: 0; z-index: 20;
+}
+.chain-pop.show {
+  animation: chainPop 1.2s ease-out forwards;
+}
+@keyframes chainPop {
+  0%   { opacity:1; transform:translate(-50%,-50%) scale(0.5); }
+  40%  { opacity:1; transform:translate(-50%,-65%) scale(1.3); }
+  100% { opacity:0; transform:translate(-50%,-90%) scale(1); }
+}
+
+@keyframes kuronyanPop {
+  0%   { opacity:0; transform:scale(0.3) rotate(-20deg); }
+  30%  { opacity:1; transform:scale(1.4) rotate(10deg); }
+  60%  { opacity:1; transform:scale(1.1) rotate(-5deg); }
+  100% { opacity:0; transform:scale(0.8) rotate(0deg); }
+}
+
+/* Win/Lose screen */
+#resultScreen {
+  display: none; position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.95);
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 24px;
+}
+#resultScreen.show { display: flex; }
+
+.result-cat { font-size: 72px; margin-bottom: 16px; animation: float 2s ease-in-out infinite; }
+.result-title {
+  font-family: 'Cinzel', serif; font-size: 36px; font-weight: 900;
+  margin-bottom: 8px;
+}
+.result-title.win { color: var(--gold); text-shadow: var(--glow-gold); }
+.result-title.lose { color: #e05050; }
+.result-score { font-size: 16px; color: rgba(201,168,76,0.8); margin-bottom: 8px; }
+.result-msg { font-size: 13px; color: rgba(201,168,76,0.6); margin-bottom: 28px; text-align: center; line-height: 1.8; }
+
+.btn-retry {
+  background: linear-gradient(135deg, var(--gold), #8b6914);
+  border: none; border-radius: 12px;
+  color: var(--dark); font-weight: 700;
+  padding: 14px 40px; cursor: pointer;
+  font-size: 15px; letter-spacing: 2px;
+  box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+  margin-bottom: 12px; width: 100%; max-width: 280px;
+}
+.btn-retry:hover { transform: translateY(-2px); }
+
+.btn-menu {
+  background: transparent;
+  border: 1px solid var(--gold-dim);
+  border-radius: 12px; color: var(--gold);
+  padding: 12px 40px; cursor: pointer;
+  font-size: 13px; letter-spacing: 1px;
+  width: 100%; max-width: 280px;
+}
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen">
+  <div class="start-logo">♠ トランプの秘密 ♠</div>
+  <div class="start-title">カードバトル</div>
+  <div class="cat-display">🎩</div>
+
+  <div class="birth-card" style="margin-bottom:12px;">
+    <div class="birth-label">✦ 名前を入力 ✦</div>
+    <div class="birth-row">
+      <input type="text" id="playerName" placeholder="名前" maxlength="10" style="width:140px;font-size:16px;">
+    </div>
+  </div>
+
+  <div class="birth-card">
+    <div class="birth-label">✦ 誕生日を入力してバースカードを解放 ✦</div>
+    <div class="birth-row">
+      <input type="number" id="bMonth" placeholder="月" min="1" max="12">
+      <span class="birth-sep">/</span>
+      <input type="number" id="bDay" placeholder="日" min="1" max="31">
+      <button class="btn-set-birth" onclick="setBirth()">解放</button>
+    </div>
+    <div class="birth-result" id="birthResult">
+      <div class="birth-result-card" id="birthResultCard"></div>
+      <div class="birth-result-desc" id="birthResultDesc"></div>
+    </div>
+  </div>
+
+  <button class="btn-start" onclick="startGame('king')">KINGに挑む</button>
+  <button class="btn-start" style="margin-top:10px;background:linear-gradient(135deg,rgba(100,100,120,0.5),rgba(60,60,80,0.5));color:rgba(201,168,76,0.4);box-shadow:none;cursor:not-allowed;border:1px solid rgba(201,168,76,0.2);" disabled>
+    友達と対戦<span style="font-size:10px;margin-left:8px;background:rgba(201,168,76,0.2);padding:2px 8px;border-radius:10px;color:rgba(201,168,76,0.6);">準備中</span>
+  </button>
+</div>
+
+<!-- HOW TO PLAY -->
+<div id="howToPlay">
+  <div class="htp-box">
+    <div class="htp-title">📖 遊び方</div>
+    <div class="htp-section">
+      <div class="htp-section-title">基本ルール</div>
+      <div class="htp-item">同じスート（♥♣♦♠）を4枚以上隣接させると消える</div>
+      <div class="htp-item">同じ数字を縦に3枚以上揃えると消える（高得点）</div>
+      <div class="htp-item">ジョーカーはどのスートにも数字にもなれる</div>
+    </div>
+    <div class="htp-section">
+      <div class="htp-section-title">バースカード</div>
+      <div class="htp-item">自分のカードは光って落ちてくる</div>
+      <div class="htp-item">光るカードを3枚以上揃えると得点3倍！</div>
+    </div>
+    <div class="htp-section">
+      <div class="htp-section-title">おじゃまカード</div>
+      <div class="htp-item">隣のカードが消えた時に一緒に消える</div>
+    </div>
+    <div class="htp-section">
+      <div class="htp-section-title">ゲージ＆ボタン</div>
+      <div class="htp-item">⚡ボタン：カードを消すと自分のゲージが溜まる。満タンで相手におじゃまを送れる</div>
+      <div class="htp-item">💥ボタン：おじゃまは任意のタイミングで送れる。溜まった数はボタンに表示</div>
+      <div class="htp-item">一気に送るか、こまめに送るか戦略次第！</div>
+    </div>
+    <div class="htp-section">
+      <div class="htp-section-title">対戦</div>
+      <div class="htp-item">相手のボードが上まで積み上がったら勝利！</div>
+      <div class="htp-item">自分のボードが積み上がったら負け</div>
+    </div>
+    <button class="htp-close" onclick="closeHelp()">閉じる ✕</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen">
+  <div class="game-header" style="justify-content:flex-end;">
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button class="btn-help" onclick="togglePause()" id="pauseBtn">⏸</button>
+      <button class="btn-help" onclick="openHelp()">📖</button>
+    </div>
+  </div>
+
+  <!-- Kuronyan animation overlay -->
+  <div id="kuronyanOverlay" style="display:none;position:fixed;inset:0;z-index:50;pointer-events:none;align-items:center;justify-content:center;">
+    <div id="kuronyanAnim" style="font-size:80px;animation:kuronyanPop 1.5s ease-out forwards;">🐈‍⬛</div>
+  </div>
+
+  <div class="battle-area">
+    <!-- King board (left) -->
+    <div class="board-panel">
+      <div class="panel-header">
+        <span class="panel-score" id="kingScore">0</span>
+      </div>
+      <div class="next-label">NEXT</div>
+      <div class="next-preview" id="kingNext"></div>
+      <div class="board-container">
+        <canvas id="kingCanvas"></canvas>
+        <div class="board-overlay" id="kingOverlay">
+          <div class="overlay-title">👑</div>
+          <div class="overlay-sub">倒した！</div>
+        </div>
+        <div class="chain-pop" id="kingChain"></div>
+      </div>
+    </div>
+
+    <div class="vs-divider">
+      <div class="vs-text">VS</div>
+    </div>
+
+    <!-- Player board (right) -->
+    <div class="board-panel">
+      <div class="panel-header">
+        <span class="panel-score" id="playerScore">0</span>
+      </div>
+      <div class="next-label">NEXT</div>
+      <div class="next-preview" id="playerNext"></div>
+      <div class="board-container">
+        <canvas id="playerCanvas"></canvas>
+        <div class="board-overlay" id="playerOverlay">
+          <div class="overlay-title">🐾</div>
+          <div class="overlay-sub">やられた…</div>
+        </div>
+        <div class="chain-pop" id="playerChain"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gauges -->
+  <div class="gauges">
+    <div class="gauge-item">
+      <div class="gauge-label" id="kingGaugeLabel" style="font-size:11px;color:rgba(201,168,76,0.9);font-weight:700;">👑 KING</div>
+      <div class="gauge-bar"><div class="gauge-fill attack" id="kingJokerGauge"></div></div>
+    </div>
+    <div class="gauge-item">
+      <div class="gauge-label" id="selfGaugeLabel" style="font-size:11px;color:rgba(201,168,76,0.9);font-weight:700;">🎩 PLAYER</div>
+      <div class="gauge-bar"><div class="gauge-fill joker" id="jokerGauge"></div></div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button class="ctrl" id="btnLeft" onclick="moveLeft()">◀</button>
+    <button class="ctrl attack-btn" id="btnAttack" onclick="sendAttack()">
+      💥
+      <span class="attack-count" id="attackCount">0</span>
+    </button>
+    <button class="ctrl joker-btn" id="btnJoker" onclick="useJoker()">⚡</button>
+    <button class="ctrl" id="btnRotate" onclick="rotate()">↻</button>
+    <button class="ctrl" id="btnRight" onclick="moveRight()">▶</button>
+    <button class="ctrl drop-btn drop-row" ontouchstart="startFast()" ontouchend="stopFast()" onmousedown="startFast()" onmouseup="stopFast()">▼ 落とす（長押し）</button>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="resultScreen">
+  <div class="result-cat" id="resultCat">🎩</div>
+  <div class="result-title" id="resultTitle">WIN!</div>
+  <div class="result-score" id="resultScore"></div>
+  <div class="result-msg" id="resultMsg"></div>
+  <button class="btn-retry" onclick="restartGame()">もう一度挑む</button>
+  <button class="btn-menu" onclick="goMenu()">タイトルへ戻る</button>
+</div>
+
+<script>
+// ========== CONSTANTS ==========
+const COLS = 6, ROWS = 11;
+const SUITS = ['♥','♣','♦','♠'];
+const SUIT_COLOR = {'♥':'#e05050','♦':'#e05050','♣':'#d8d0c0','♠':'#d8d0c0'};
+const NUMS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+
+// Birth card table (abbreviated - key dates)
+const BIRTH_TABLE = {
+  '1/1':'KS','1/2':'QS','1/3':'JS','1/4':'10S','1/5':'9S','1/6':'8S','1/7':'7S','1/8':'6S','1/9':'5S','1/10':'4S','1/11':'3S','1/12':'2S','1/13':'AS','1/14':'KD','1/15':'QD','1/16':'JD','1/17':'10D','1/18':'9D','1/19':'8D','1/20':'7D','1/21':'6D','1/22':'5D','1/23':'4D','1/24':'3D','1/25':'2D','1/26':'AD','1/27':'KC','1/28':'QC','1/29':'JC','1/30':'10C','1/31':'9C',
+  '2/1':'JS','2/2':'10S','2/3':'9S','2/4':'8S','2/5':'7S','2/6':'6S','2/7':'5S','2/8':'4S','2/9':'3S','2/10':'2S','2/11':'AS','2/12':'KD','2/13':'QD','2/14':'JD','2/15':'10D','2/16':'9D','2/17':'8D','2/18':'7D','2/19':'6D','2/20':'5D','2/21':'4D','2/22':'3D','2/23':'2D','2/24':'AD','2/25':'KC','2/26':'QC','2/27':'JC','2/28':'10C','2/29':'9C',
+  '3/1':'9S','3/2':'8S','3/3':'7S','3/4':'6S','3/5':'5S','3/6':'4S','3/7':'3S','3/8':'2S','3/9':'AS','3/10':'KD','3/11':'QD','3/12':'JD','3/13':'10D','3/14':'9D','3/15':'8D','3/16':'7D','3/17':'6D','3/18':'5D','3/19':'4D','3/20':'3D','3/21':'2D','3/22':'AD','3/23':'KC','3/24':'QC','3/25':'JC','3/26':'10C','3/27':'9C','3/28':'8C','3/29':'7C','3/30':'6C','3/31':'5C',
+  '4/1':'7S','4/2':'6S','4/3':'5S','4/4':'4S','4/5':'3S','4/6':'2S','4/7':'AS','4/8':'KD','4/9':'QD','4/10':'JD','4/11':'10D','4/12':'9D','4/13':'8D','4/14':'7D','4/15':'6D','4/16':'5D','4/17':'4D','4/18':'3D','4/19':'2D','4/20':'AD','4/21':'KC','4/22':'QC','4/23':'JC','4/24':'10C','4/25':'9C','4/26':'8C','4/27':'7C','4/28':'6C','4/29':'5C','4/30':'4C',
+  '5/1':'5S','5/2':'4S','5/3':'3S','5/4':'2S','5/5':'AS','5/6':'KD','5/7':'QD','5/8':'JD','5/9':'10D','5/10':'9D','5/11':'8D','5/12':'7D','5/13':'6D','5/14':'5D','5/15':'4D','5/16':'3D','5/17':'2D','5/18':'AD','5/19':'KC','5/20':'QC','5/21':'JC','5/22':'10C','5/23':'9C','5/24':'8C','5/25':'7C','5/26':'6C','5/27':'5C','5/28':'4C','5/29':'3C','5/30':'2C','5/31':'AC',
+  '6/1':'3S','6/2':'2S','6/3':'AS','6/4':'KD','6/5':'QD','6/6':'JD','6/7':'10D','6/8':'9D','6/9':'8D','6/10':'7D','6/11':'6D','6/12':'5D','6/13':'4D','6/14':'3D','6/15':'2D','6/16':'AD','6/17':'KC','6/18':'QC','6/19':'JC','6/20':'10C','6/21':'9C','6/22':'8C','6/23':'7C','6/24':'6C','6/25':'5C','6/26':'4C','6/27':'3C','6/28':'2C','6/29':'AC','6/30':'KH',
+  '7/1':'AS','7/2':'KD','7/3':'QD','7/4':'JD','7/5':'10D','7/6':'9D','7/7':'8D','7/8':'7D','7/9':'6D','7/10':'5D','7/11':'4D','7/12':'3D','7/13':'2D','7/14':'AD','7/15':'KC','7/16':'QC','7/17':'JC','7/18':'10C','7/19':'9C','7/20':'8C','7/21':'7C','7/22':'6C','7/23':'5C','7/24':'4C','7/25':'3C','7/26':'2C','7/27':'AC','7/28':'KH','7/29':'QH','7/30':'JH','7/31':'10H',
+  '8/1':'QD','8/2':'JD','8/3':'10D','8/4':'9D','8/5':'8D','8/6':'7D','8/7':'6D','8/8':'5D','8/9':'4D','8/10':'3D','8/11':'2D','8/12':'AD','8/13':'KC','8/14':'QC','8/15':'JC','8/16':'10C','8/17':'9C','8/18':'8C','8/19':'7C','8/20':'6C','8/21':'5C','8/22':'4C','8/23':'3C','8/24':'2C','8/25':'AC','8/26':'KH','8/27':'QH','8/28':'JH','8/29':'10H','8/30':'9H','8/31':'8H',
+  '9/1':'10D','9/2':'9D','9/3':'8D','9/4':'7D','9/5':'6D','9/6':'5D','9/7':'4D','9/8':'3D','9/9':'2D','9/10':'AD','9/11':'KC','9/12':'QC','9/13':'JC','9/14':'10C','9/15':'9C','9/16':'8C','9/17':'7C','9/18':'6C','9/19':'5C','9/20':'4C','9/21':'3C','9/22':'2C','9/23':'AC','9/24':'KH','9/25':'QH','9/26':'JH','9/27':'10H','9/28':'9H','9/29':'8H','9/30':'7H',
+  '10/1':'8D','10/2':'7D','10/3':'6D','10/4':'5D','10/5':'4D','10/6':'3D','10/7':'2D','10/8':'AD','10/9':'KC','10/10':'QC','10/11':'JC','10/12':'10C','10/13':'9C','10/14':'8C','10/15':'7C','10/16':'6C','10/17':'5C','10/18':'4C','10/19':'3C','10/20':'2C','10/21':'AC','10/22':'KH','10/23':'QH','10/24':'JH','10/25':'10H','10/26':'9H','10/27':'8H','10/28':'7H','10/29':'6H','10/30':'5H','10/31':'4H',
+  '11/1':'6D','11/2':'5D','11/3':'4D','11/4':'3D','11/5':'2D','11/6':'AD','11/7':'KC','11/8':'QC','11/9':'JC','11/10':'10C','11/11':'9C','11/12':'8C','11/13':'7C','11/14':'6C','11/15':'5C','11/16':'4C','11/17':'3C','11/18':'2C','11/19':'AC','11/20':'KH','11/21':'QH','11/22':'JH','11/23':'10H','11/24':'9H','11/25':'8H','11/26':'7H','11/27':'6H','11/28':'5H','11/29':'4H','11/30':'3H',
+  '12/1':'4D','12/2':'3D','12/3':'2D','12/4':'AD','12/5':'KC','12/6':'QC','12/7':'JC','12/8':'10C','12/9':'9C','12/10':'8C','12/11':'7C','12/12':'6C','12/13':'5C','12/14':'4C','12/15':'3C','12/16':'2C','12/17':'AC','12/18':'KH','12/19':'QH','12/20':'JH','12/21':'10H','12/22':'9H','12/23':'8H','12/24':'7H','12/25':'6H','12/26':'5H','12/27':'4H','12/28':'3H','12/29':'2H','12/30':'AH','12/31':'JK',
+};
+
+const CARD_DESC = {
+  H:'愛のカード', C:'知恵のカード', D:'価値のカード', S:'変革のカード', JK:'鏡のカード'
+};
+
+// ========== STATE ==========
+let birthCard = null; // {suit, num, code}
+let playerState = null;
+let kingState = null;
+let gameRunning = false;
+let jokerGauge = 0; // 0-100
+let attackStock = 0; // 0-10
+let fastFalling = false;
+let fastTimer = null;
+let gameLoopTimer = null;
+let helpOpen = false;
+let paused = false;
+
+const CELL = 28;
+
+function togglePause() {
+  if (!gameRunning) return;
+  paused = !paused;
+  document.getElementById('pauseBtn').textContent = paused ? '▶' : '⏸';
+  if (paused) {
+    clearInterval(gameLoopTimer);
+  } else {
+    gameLoopTimer = setInterval(gameLoop, 700);
+  }
+}
+
+function showKuronyan() {
+  const overlay = document.getElementById('kuronyanOverlay');
+  const anim = document.getElementById('kuronyanAnim');
+  overlay.style.display = 'flex';
+  anim.style.animation = 'none';
+  void anim.offsetWidth;
+  anim.style.animation = 'kuronyanPop 1.5s ease-out forwards';
+  setTimeout(() => { overlay.style.display = 'none'; }, 1500);
+}
+
+// ========== CANVAS SETUP ==========
+function setupCanvas() {
+  const W = COLS * CELL, H = ROWS * CELL;
+  ['playerCanvas','kingCanvas'].forEach(id => {
+    const c = document.getElementById(id);
+    c.width = W; c.height = H;
+  });
+}
+
+// ========== BIRTH CARD ==========
+function setBirth() {
+  const m = parseInt(document.getElementById('bMonth').value);
+  const d = parseInt(document.getElementById('bDay').value);
+  if (!m || !d) return;
+  const key = `${m}/${d}`;
+  const code = BIRTH_TABLE[key];
+  if (!code) { alert('その日付は見つかりませんでした'); return; }
+
+  let suit, num;
+  if (code === 'JK') { suit = '🃏'; num = 'JK'; }
+  else {
+    const sm = {'H':'♥','C':'♣','D':'♦','S':'♠'};
+    suit = sm[code.slice(-1)];
+    num = code.slice(0,-1);
+  }
+  birthCard = {suit, num, code};
+
+  const desc = code==='JK' ? CARD_DESC.JK : CARD_DESC[code.slice(-1)];
+  document.getElementById('birthResultCard').textContent = `${num}${suit}`;
+  document.getElementById('birthResultDesc').textContent = 'あなたのカード ✦ 3枚揃えでポイント3倍！';
+  document.getElementById('birthResult').classList.add('show');
+  
+  // Update game badge if game is running
+  const badge = document.getElementById('birthBadge');
+  if (badge) { badge.textContent = `${num}${suit}`; badge.style.display='block'; }
+}
+
+// ========== GAME INIT ==========
+function startGame(mode='king') {
+  // Save name and birth to localStorage
+  const nameInput = document.getElementById('playerName').value.trim();
+  const name = nameInput ? nameInput.toUpperCase() : 'PLAYER';
+  if (nameInput) localStorage.setItem('trump_name', nameInput);
+  if (birthCard) {
+    localStorage.setItem('trump_birth_month', document.getElementById('bMonth').value);
+    localStorage.setItem('trump_birth_day', document.getElementById('bDay').value);
+  }
+
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('gameScreen').classList.add('show');
+  
+  // Update gauge labels with birth card + names
+  const birthStr = birthCard ? `${birthCard.num}${birthCard.suit} ` : '';
+  document.getElementById('selfGaugeLabel').innerHTML = `<span style="color:#ffd850;font-weight:900;">${birthStr}</span><span style="color:#f0d080;font-weight:700;">${name}</span>`;
+  document.getElementById('kingGaugeLabel').innerHTML = `<span style="color:#f0d080;font-weight:700;">👑 KING</span>`;
+  
+  setupCanvas();
+  initGame();
+}
+
+// Load saved data on page load
+window.addEventListener('load', () => {
+  const savedName = localStorage.getItem('trump_name');
+  const savedMonth = localStorage.getItem('trump_birth_month');
+  const savedDay = localStorage.getItem('trump_birth_day');
+  
+  if (savedName) document.getElementById('playerName').value = savedName;
+  if (savedMonth && savedDay) {
+    document.getElementById('bMonth').value = savedMonth;
+    document.getElementById('bDay').value = savedDay;
+    setBirth();
+  }
+});
+
+function initGame() {
+  playerState = createGameState('player');
+  kingState = createGameState('king');
+  jokerGauge = 0;
+  attackStock = 0;
+  kingJokerGaugeVal = 0;
+  gameRunning = true;
+  updateGauges();
+  updateAttackBtn();
+  
+  clearInterval(gameLoopTimer);
+  gameLoopTimer = setInterval(gameLoop, 700);
+  
+  drawBoard('playerCanvas', playerState);
+  drawBoard('kingCanvas', kingState);
+  renderNext('playerNext', playerState.next);
+  renderNext('kingNext', kingState.next);
+}
+
+function createGameState(type) {
+  return {
+    type,
+    board: Array.from({length:ROWS}, ()=>Array(COLS).fill(null)),
+    current: spawnPiece(),
+    next: spawnPiece(),
+    score: 0,
+    dead: false,
+  };
+}
+
+function spawnPiece() {
+  return {
+    cards: [randomCard(), randomCard()],
+    x: Math.floor(COLS/2) - 1,
+    y: 0,
+    rot: 0
+  };
+}
+
+function randomCard(isObstacle=false) {
+  if (isObstacle) return {suit:'👿', num:'★', isObstacle:true};
+  
+  // Small chance of joker
+  if (Math.random() < 0.05) return {suit:'🃏', num:'JK', isJoker:true};
+  
+  const suit = SUITS[Math.floor(Math.random()*SUITS.length)];
+  const num = NUMS[Math.floor(Math.random()*NUMS.length)];
+  
+  // Birth card glow
+  let isBirth = false;
+  if (birthCard && birthCard.code !== 'JK') {
+    isBirth = (suit === birthCard.suit && num === birthCard.num);
+  } else if (birthCard && birthCard.code === 'JK' && num==='JK') {
+    isBirth = true;
+  }
+  
+  return {suit, num, isBirth};
+}
+
+// ========== GAME LOOP ==========
+function gameLoop() {
+  if (!gameRunning || helpOpen || paused) return;
+  
+  // Player step
+  if (!playerState.dead) {
+    if (!moveDown(playerState)) {
+      placePiece(playerState);
+    }
+    drawBoard('playerCanvas', playerState);
+  }
+  
+  // King AI step
+  if (!kingState.dead) {
+    kingAI();
+    if (!moveDown(kingState)) {
+      placePiece(kingState);
+    }
+    drawBoard('kingCanvas', kingState);
+  }
+  
+  document.getElementById('playerScore').textContent = playerState.score.toLocaleString();
+  document.getElementById('kingScore').textContent = kingState.score.toLocaleString();
+}
+
+function kingAI() {
+  // Simple AI: occasionally rotate and move
+  if (Math.random() < 0.3) {
+    const newRot = (kingState.current.rot + 1) % 4;
+    const pos = getPositions(kingState.current.x, kingState.current.y, newRot);
+    if (validPositions(pos, kingState.board)) kingState.current.rot = newRot;
+  }
+  if (Math.random() < 0.4) {
+    const dir = Math.random() < 0.5 ? -1 : 1;
+    const nx = kingState.current.x + dir;
+    const pos = getPositions(nx, kingState.current.y, kingState.current.rot);
+    if (validPositions(pos, kingState.board)) kingState.current.x = nx;
+  }
+}
+
+// ========== PIECE MOVEMENT ==========
+function getPositions(x, y, rot) {
+  if (rot===0) return [[x,y],[x,y+1]];
+  if (rot===1) return [[x,y],[x+1,y]];
+  if (rot===2) return [[x,y+1],[x,y]];
+  return [[x+1,y],[x,y]];
+}
+
+function validPositions(positions, board) {
+  for (const [px,py] of positions) {
+    if (px<0||px>=COLS||py>=ROWS) return false;
+    if (py>=0 && board[py][px]) return false;
+  }
+  return true;
+}
+
+function moveDown(state) {
+  const {x,y,rot} = state.current;
+  const pos = getPositions(x,y+1,rot);
+  if (validPositions(pos, state.board)) { state.current.y++; return true; }
+  return false;
+}
+
+function moveLeft() {
+  if (!gameRunning || playerState.dead) return;
+  const {x,y,rot} = playerState.current;
+  const pos = getPositions(x-1,y,rot);
+  if (validPositions(pos, playerState.board)) {
+    playerState.current.x--;
+    drawBoard('playerCanvas', playerState);
+  }
+}
+
+function moveRight() {
+  if (!gameRunning || playerState.dead) return;
+  const {x,y,rot} = playerState.current;
+  const pos = getPositions(x+1,y,rot);
+  if (validPositions(pos, playerState.board)) {
+    playerState.current.x++;
+    drawBoard('playerCanvas', playerState);
+  }
+}
+
+function rotate() {
+  if (!gameRunning || playerState.dead) return;
+  const newRot = (playerState.current.rot+1)%4;
+  let nx = playerState.current.x;
+  // Adjust x if horizontal rotation would go out of bounds
+  if (newRot===1 || newRot===3) {
+    if (nx+1 >= COLS) nx = COLS-2;
+  }
+  const pos = getPositions(nx, playerState.current.y, newRot);
+  if (validPositions(pos, playerState.board)) {
+    playerState.current.rot = newRot;
+    playerState.current.x = nx;
+    drawBoard('playerCanvas', playerState);
+  }
+}
+
+function startFast() { fastFalling=true; fastTimer=setInterval(()=>{ if(!moveDown(playerState)){placePiece(playerState);stopFast();} else drawBoard('playerCanvas',playerState); },60); }
+function stopFast() { fastFalling=false; clearInterval(fastTimer); }
+
+// ========== PLACE & CLEAR ==========
+function placePiece(state) {
+  const {x,y,cards,rot} = state.current;
+  const pos = getPositions(x,y,rot);
+  
+  for (const [px,py] of pos) {
+    if (py<0) { endGame(state); return; }
+  }
+  
+  pos.forEach(([px,py],i)=>{
+    if(py>=0&&py<ROWS&&px>=0&&px<COLS) state.board[py][px]=cards[i];
+  });
+  
+  applyGravity(state.board);
+  const cleared = checkAndClear(state);
+  
+  state.current = state.next;
+  state.next = spawnPiece();
+  
+  const newPos = getPositions(state.current.x, state.current.y, state.current.rot);
+  for (const [px,py] of newPos) {
+    if (py>=0 && state.board[py] && state.board[py][px]) { endGame(state); return; }
+  }
+  
+  const nextId = state.type==='player' ? 'playerNext' : 'kingNext';
+  renderNext(nextId, state.next);
+}
+
+function applyGravity(board) {
+  for (let c=0;c<COLS;c++) {
+    let write=ROWS-1;
+    for (let r=ROWS-1;r>=0;r--) {
+      if (board[r][c]) { board[write][c]=board[r][c]; if(write!==r)board[r][c]=null; write--; }
+    }
+    while(write>=0){board[write][c]=null;write--;}
+  }
+}
+
+function checkAndClear(state) {
+  const toDelete = new Set();
+  
+  // Suit flood fill (4+)
+  for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+    if (!state.board[r][c] || state.board[r][c].isObstacle) continue;
+    const card = state.board[r][c];
+    const suit = card.isJoker ? null : card.suit;
+    if (!suit) continue;
+    const group = floodFill(r,c,state.board,'suit');
+    if (group.length>=4) group.forEach(([gr,gc])=>toDelete.add(`${gr},${gc}`));
+  }
+  
+  // Number vertical (3+)
+  for (let c=0;c<COLS;c++) {
+    let streak=[], lastNum=null;
+    for (let r=0;r<ROWS;r++) {
+      const cell = state.board[r][c];
+      const num = cell && !cell.isObstacle ? (cell.isJoker ? lastNum : cell.num) : null;
+      if (num && num===lastNum) {
+        streak.push([r,c]);
+        if (streak.length>=3) streak.forEach(([sr,sc])=>toDelete.add(`${sr},${sc}`));
+      } else {
+        streak = num ? [[r,c]] : [];
+        lastNum = num;
+      }
+    }
+  }
+  
+  // Birth card bonus (3+)
+  if (birthCard && state.type==='player') {
+    const bGroup = [];
+    for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
+      if (state.board[r][c] && state.board[r][c].isBirth) bGroup.push([r,c]);
+    }
+    if (bGroup.length>=3) {
+      let bonusScore = bGroup.length * 300 * 3;
+      state.score += bonusScore;
+      bGroup.forEach(([r,c])=>toDelete.add(`${r},${c}`));
+      showChain(state.type==='player'?'playerChain':'kingChain', 'バースカード×3！');
+    }
+  }
+  
+  if (toDelete.size===0) return false;
+  
+  // Obstacle chain clear
+  const obstacleCheck = new Set();
+  toDelete.forEach(key=>{
+    const [r,c]=key.split(',').map(Number);
+    [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([nr,nc])=>{
+      if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&state.board[nr][nc]&&state.board[nr][nc].isObstacle){
+        obstacleCheck.add(`${nr},${nc}`);
+      }
+    });
+  });
+  obstacleCheck.forEach(k=>toDelete.add(k));
+  
+  const baseScore = toDelete.size * 100;
+  state.score += baseScore;
+  
+  // Gauge update (player only)
+  if (state.type==='player') {
+    const prevGauge = jokerGauge;
+    jokerGauge = Math.min(100, jokerGauge + toDelete.size * 8);
+    // Attack stock increases when gauge fills completely, then resets
+    if (prevGauge < 100 && jokerGauge >= 100) {
+      attackStock = Math.min(10, attackStock + 1);
+      jokerGauge = 0; // reset to refill again
+    }
+    updateGauges();
+    updateAttackBtn();
+    if (toDelete.size>=8) showChain('playerChain', `${toDelete.size}枚消去！`);
+  } else {
+    // Update king's gauge
+    kingJokerGaugeVal = Math.min(100, kingJokerGaugeVal + toDelete.size * 8);
+    updateGauges();
+  }
+  
+  toDelete.forEach(key=>{
+    const [r,c]=key.split(',').map(Number);
+    state.board[r][c]=null;
+  });
+  
+  applyGravity(state.board);
+  
+  setTimeout(()=>{
+    const more = checkAndClear(state);
+    if(!more) {
+      drawBoard(state.type==='player'?'playerCanvas':'kingCanvas', state);
+    }
+  },150);
+  
+  return true;
+}
+
+function floodFill(row, col, board, mode) {
+  const visited=new Set(), queue=[[row,col]], result=[];
+  const targetCard = board[row][col];
+  const targetVal = mode==='suit' ? targetCard.suit : targetCard.num;
+  
+  while(queue.length) {
+    const [r,c]=queue.shift(), key=`${r},${c}`;
+    if(visited.has(key)) continue;
+    if(r<0||r>=ROWS||c<0||c>=COLS) continue;
+    const cell=board[r][c];
+    if(!cell||cell.isObstacle) continue;
+    const val = cell.isJoker ? targetVal : (mode==='suit'?cell.suit:cell.num);
+    if(val!==targetVal) continue;
+    visited.add(key); result.push([r,c]);
+    queue.push([r-1,c],[r+1,c],[r,c-1],[r,c+1]);
+  }
+  return result;
+}
+
+// ========== GAUGES & BUTTONS ==========
+let kingJokerGaugeVal = 0; // king's gauge 0-100
+
+function updateGauges() {
+  document.getElementById('jokerGauge').style.width = jokerGauge+'%';
+  document.getElementById('kingJokerGauge').style.width = kingJokerGaugeVal+'%';
+}
+
+function updateAttackBtn() {
+  document.getElementById('attackCount').textContent = attackStock;
+  const btn = document.getElementById('btnAttack');
+  btn.classList.toggle('ready', attackStock>0);
+  const jBtn = document.getElementById('btnJoker');
+  // Joker gauge shows fill progress, lights up when gauge is filling
+  jBtn.classList.toggle('ready', jokerGauge > 50);
+}
+
+function sendAttack() {
+  if (attackStock<=0 || kingState.dead) return;
+  const count = attackStock;
+  attackStock = 0;
+  updateGauges(); updateAttackBtn();
+  
+  // Add obstacle cards to king's board
+  let added=0;
+  for(let i=0;i<count&&added<count;i++) {
+    const col = Math.floor(Math.random()*COLS);
+    for(let r=ROWS-1;r>=0;r--) {
+      if(!kingState.board[r][col]) {
+        kingState.board[r][col]={suit:'👿',num:'★',isObstacle:true};
+        added++; break;
+      }
+    }
+  }
+  applyGravity(kingState.board);
+  showChain('kingChain', `💥おじゃま${count}枚！`);
+  drawBoard('kingCanvas', kingState);
+}
+
+function useJoker() {
+  if (jokerGauge<100 || kingState.dead) return;
+  jokerGauge=0;
+  
+  // Show kuronyan animation
+  showKuronyan();
+  
+  // Send 3 obstacles to king
+  for(let i=0;i<3;i++) {
+    const col=Math.floor(Math.random()*COLS);
+    for(let r=ROWS-1;r>=0;r--) {
+      if(!kingState.board[r][col]){
+        kingState.board[r][col]={suit:'👿',num:'★',isObstacle:true};
+        break;
+      }
+    }
+  }
+  applyGravity(kingState.board);
+  updateGauges(); updateAttackBtn();
+  showChain('playerChain','🐱くろにゃん発動！');
+  showChain('kingChain','💥おじゃま3枚！');
+  drawBoard('kingCanvas',kingState);
+}
+
+// ========== DRAWING ==========
+function drawBoard(canvasId, state) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const W=COLS*CELL, H=ROWS*CELL;
+  
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='rgba(0,0,0,0.7)'; ctx.fillRect(0,0,W,H);
+  
+  // Grid
+  ctx.strokeStyle='rgba(201,168,76,0.06)'; ctx.lineWidth=0.5;
+  for(let r=0;r<=ROWS;r++){ctx.beginPath();ctx.moveTo(0,r*CELL);ctx.lineTo(W,r*CELL);ctx.stroke();}
+  for(let c=0;c<=COLS;c++){ctx.beginPath();ctx.moveTo(c*CELL,0);ctx.lineTo(c*CELL,H);ctx.stroke();}
+  
+  // Board
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) {
+    if(state.board[r][c]) drawCard(ctx,c*CELL,r*CELL,state.board[r][c],false);
+  }
+  
+  // Current piece
+  if(state.current && !state.dead) {
+    const {x,y,cards,rot}=state.current;
+    const pos=getPositions(x,y,rot);
+    
+    // Ghost
+    let gy=y;
+    while(true){const gp=getPositions(x,gy+1,rot);if(!validPositions(gp,state.board))break;gy++;}
+    if(gy!==y){
+      const gpos=getPositions(x,gy,rot);
+      gpos.forEach(([px,py],i)=>{if(py>=0)drawGhost(ctx,px*CELL,py*CELL,cards[i]);});
+    }
+    
+    pos.forEach(([px,py],i)=>{if(py>=0)drawCard(ctx,px*CELL,py*CELL,cards[i],true);});
+  }
+}
+
+function drawCard(ctx,x,y,card,active) {
+  if(card.isObstacle) {
+    // Obstacle card - dark with skull
+    ctx.fillStyle=active?'#1a0a0a':'#120808';
+    roundRect(ctx,x+1,y+1,CELL-2,CELL-2,5); ctx.fill();
+    ctx.strokeStyle='rgba(224,80,80,0.5)'; ctx.lineWidth=1;
+    roundRect(ctx,x+1,y+1,CELL-2,CELL-2,5); ctx.stroke();
+    ctx.font=`${CELL*0.5}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(224,80,80,0.8)';
+    ctx.fillText('👿',x+CELL/2,y+CELL/2);
+    return;
+  }
+  
+  const isRed=card.suit==='♥'||card.suit==='♦';
+  const color=SUIT_COLOR[card.suit]||'#e8e0d0';
+  const isBirth=card.isBirth;
+  const isJoker=card.isJoker;
+  
+  // Background
+  ctx.fillStyle=active?(isBirth?'#1e1a08':isJoker?'#0a0a1e':'#1a1a2a'):(isBirth?'#16140a':'#10101a');
+  roundRect(ctx,x+1,y+1,CELL-2,CELL-2,5); ctx.fill();
+  
+  // Border
+  if(isBirth){
+    ctx.strokeStyle=`rgba(255,220,80,${active?1:0.7})`;
+    ctx.lineWidth=active?2:1.5;
+    if(active){ctx.shadowColor='rgba(255,220,80,0.8)';ctx.shadowBlur=8;}
+  } else if(isJoker){
+    ctx.strokeStyle=`rgba(180,140,255,${active?0.9:0.5})`;
+    ctx.lineWidth=1.5;
+  } else {
+    ctx.strokeStyle=active?'rgba(201,168,76,0.7)':'rgba(201,168,76,0.25)';
+    ctx.lineWidth=active?1.5:1;
+  }
+  roundRect(ctx,x+1,y+1,CELL-2,CELL-2,5); ctx.stroke();
+  ctx.shadowBlur=0;
+  
+  // Suit symbol
+  ctx.font=`bold ${CELL*0.42}px serif`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  if(isBirth&&active){ctx.shadowColor='rgba(255,220,80,0.9)';ctx.shadowBlur=12;}
+  ctx.fillStyle=isJoker?'#c080ff':(isBirth?'#ffd850':color);
+  ctx.fillText(isJoker?'🃏':card.suit,x+CELL/2,y+CELL/2+2);
+  ctx.shadowBlur=0;
+  
+  // Number
+  ctx.font=`bold ${CELL*0.2}px 'Cinzel',serif`;
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillStyle=isBirth?'#ffd850':(isJoker?'#c080ff':`${color}cc`);
+  ctx.fillText(isJoker?'★':card.num,x+3,y+2);
+}
+
+function drawGhost(ctx,x,y,card) {
+  const color=card.isJoker?'#c080ff':(SUIT_COLOR[card.suit]||'#e8e0d0');
+  ctx.strokeStyle=`${color}30`; ctx.lineWidth=1;
+  roundRect(ctx,x+1,y+1,CELL-2,CELL-2,5); ctx.stroke();
+  ctx.fillStyle=`${color}18`;
+  roundRect(ctx,x+1,y+1,CELL-2,CELL-2,5); ctx.fill();
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);
+  ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+}
+
+function renderNext(id, piece) {
+  const el=document.getElementById(id); el.innerHTML='';
+  if(!piece) return;
+  piece.cards.forEach(card=>{
+    const d=document.createElement('div');
+    d.className='next-card-mini';
+    d.textContent=card.isJoker?'🃏':(card.isObstacle?'👿':card.suit);
+    d.style.color=card.isJoker?'#c080ff':(SUIT_COLOR[card.suit]||'#e8e0d0');
+    el.appendChild(d);
+  });
+}
+
+// ========== END GAME ==========
+function endGame(state) {
+  state.dead=true;
+  const overlayId=state.type==='player'?'playerOverlay':'kingOverlay';
+  document.getElementById(overlayId).classList.add('show');
+  
+  setTimeout(()=>{
+    gameRunning=false;
+    clearInterval(gameLoopTimer);
+    
+    const playerWon = state.type==='king';
+    
+    document.getElementById('resultCat').textContent = playerWon ? '🎩' : '🐾';
+    const titleEl = document.getElementById('resultTitle');
+    titleEl.textContent = playerWon ? 'WIN!' : 'LOSE...';
+    titleEl.className = 'result-title ' + (playerWon ? 'win' : 'lose');
+    document.getElementById('resultScore').textContent = `スコア: ${playerState.score.toLocaleString()}`;
+    document.getElementById('resultMsg').textContent = playerWon ?
+      'やったにゃ！\nKINGを倒したにゃ！🎩' :
+      'KINGには勝てなかった…\nもう一度挑戦するにゃ🎩';
+    
+    setTimeout(()=>{
+      document.getElementById('resultScreen').classList.add('show');
+    }, 800);
+  }, 500);
+}
+
+function showChain(id, text) {
+  const el=document.getElementById(id);
+  el.textContent=text; el.className='chain-pop';
+  void el.offsetWidth;
+  el.className='chain-pop show';
+  setTimeout(()=>{el.className='chain-pop';},1300);
+}
+
+// ========== UI ==========
+function openHelp() {
+  helpOpen=true;
+  document.getElementById('howToPlay').classList.add('show');
+}
+function closeHelp() {
+  helpOpen=false;
+  document.getElementById('howToPlay').classList.remove('show');
+}
+
+function restartGame() {
+  document.getElementById('resultScreen').classList.remove('show');
+  document.getElementById('playerOverlay').classList.remove('show');
+  document.getElementById('kingOverlay').classList.remove('show');
+  initGame();
+}
+
+function goMenu() {
+  document.getElementById('resultScreen').classList.remove('show');
+  document.getElementById('gameScreen').classList.remove('show');
+  document.getElementById('playerOverlay').classList.remove('show');
+  document.getElementById('kingOverlay').classList.remove('show');
+  document.getElementById('startScreen').style.display='flex';
+  clearInterval(gameLoopTimer);
+}
+
+// ========== KEYBOARD ==========
+document.addEventListener('keydown',e=>{
+  if(!gameRunning||helpOpen) return;
+  if(e.key==='ArrowLeft') moveLeft();
+  if(e.key==='ArrowRight') moveRight();
+  if(e.key==='ArrowDown') { if(!fastFalling) startFast(); }
+  if(e.key==='ArrowUp'||e.key==='z'||e.key==='Z') rotate();
+  if(e.key===' ') { e.preventDefault(); sendAttack(); }
+  if(e.key==='x'||e.key==='X') useJoker();
+});
+document.addEventListener('keyup',e=>{ if(e.key==='ArrowDown') stopFast(); });
+</script>
+</body>
+</html>
