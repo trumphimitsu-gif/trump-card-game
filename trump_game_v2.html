@@ -537,7 +537,7 @@ canvas { display: block; }
     <div class="htp-section">
       <div class="htp-section-title">バースカード</div>
       <div class="htp-item">自分のカードは光って落ちてくる</div>
-      <div class="htp-item">光るカードを3枚以上揃えると得点3倍！</div>
+      <div class="htp-item">光るカードが消えると得点3倍！</div>
     </div>
     <div class="htp-section">
       <div class="htp-section-title">おじゃまカード</div>
@@ -545,7 +545,6 @@ canvas { display: block; }
     </div>
     <div class="htp-section">
       <div class="htp-section-title">ゲージ＆ボタン</div>
-      <div class="htp-item">⚡ボタン：カードを消すと自分のゲージが溜まる。満タンで相手におじゃまを送れる</div>
       <div class="htp-item">💥ボタン：おじゃまは任意のタイミングで送れる。溜まった数はボタンに表示</div>
       <div class="htp-item">一気に送るか、こまめに送るか戦略次第！</div>
     </div>
@@ -562,7 +561,6 @@ canvas { display: block; }
 <div id="gameScreen">
   <div class="game-header" style="justify-content:flex-end;">
     <div style="display:flex;gap:6px;align-items:center;">
-      <button class="btn-help" onclick="togglePause()" id="pauseBtn">⏸</button>
       <button class="btn-help" onclick="openHelp()">📖</button>
     </div>
   </div>
@@ -624,14 +622,14 @@ canvas { display: block; }
     </div>
   </div>
 
-  <!-- Controls -->
+  <!-- Controls: 左移動 / ⏸一時停止 / 💥おじゃま / ↻回転 / 右移動 -->
   <div class="controls">
     <button class="ctrl" id="btnLeft" onclick="moveLeft()">◀</button>
+    <button class="ctrl" id="pauseBtn" onclick="togglePause()">⏸</button>
     <button class="ctrl attack-btn" id="btnAttack" onclick="sendAttack()">
       💥
       <span class="attack-count" id="attackCount">0</span>
     </button>
-    <button class="ctrl joker-btn" id="btnJoker" onclick="useJoker()">⚡</button>
     <button class="ctrl" id="btnRotate" onclick="rotate()">↻</button>
     <button class="ctrl" id="btnRight" onclick="moveRight()">▶</button>
     <button class="ctrl drop-btn drop-row" ontouchstart="startFast()" ontouchend="stopFast()" onmousedown="startFast()" onmouseup="stopFast()">▼ 落とす（長押し）</button>
