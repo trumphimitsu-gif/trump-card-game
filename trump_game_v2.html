@@ -37,6 +37,13 @@ body {
                     radial-gradient(ellipse at 70% 90%, rgba(80,60,160,0.04) 0%, transparent 60%);
 }
 
+/* PC対応 */
+@media (min-width: 600px) {
+  #startScreen, #gameScreen { max-width: 560px; }
+  .controls .ctrl { font-size: 22px; padding: 16px 8px; }
+  .ctrl.drop-btn { font-size: 16px; padding: 14px; }
+}
+
 /* ===== START SCREEN ===== */
 #startScreen {
   position: fixed; inset: 0; z-index: 100;
@@ -692,7 +699,13 @@ function showKuronyan() {
 
 // ========== CANVAS SETUP ==========
 function setupCanvas() {
-  const W = COLS * CELL, H = ROWS * CELL;
+  // Responsive cell size
+  const screenW = Math.min(window.innerWidth, 560);
+  const boardW = (screenW - 32) / 2 - 20; // account for padding and VS divider
+  const dynamicCell = Math.floor(boardW / COLS);
+  window.DYNAMIC_CELL = Math.max(28, Math.min(dynamicCell, 44));
+  
+  const W = COLS * window.DYNAMIC_CELL, H = ROWS * window.DYNAMIC_CELL;
   ['playerCanvas','kingCanvas'].forEach(id => {
     const c = document.getElementById(id);
     c.width = W; c.height = H;
@@ -784,26 +797,27 @@ function initGame() {
 }
 
 function createGameState(type) {
+  const forKing = type === 'king';
   return {
     type,
     board: Array.from({length:ROWS}, ()=>Array(COLS).fill(null)),
-    current: spawnPiece(),
-    next: spawnPiece(),
+    current: spawnPiece(forKing),
+    next: spawnPiece(forKing),
     score: 0,
     dead: false,
   };
 }
 
-function spawnPiece() {
+function spawnPiece(forKing=false) {
   return {
-    cards: [randomCard(), randomCard()],
+    cards: [randomCard(false, forKing), randomCard(false, forKing)],
     x: Math.floor(COLS/2) - 1,
     y: 0,
     rot: 0
   };
 }
 
-function randomCard(isObstacle=false) {
+function randomCard(isObstacle=false, forKing=false) {
   if (isObstacle) return {suit:'👿', num:'★', isObstacle:true};
   
   // Small chance of joker
@@ -814,7 +828,10 @@ function randomCard(isObstacle=false) {
   
   // Birth card glow
   let isBirth = false;
-  if (birthCard && birthCard.code !== 'JK') {
+  if (forKing) {
+    // KINGのバースカードは♠️K（1/1生まれ）
+    isBirth = (suit === '♠' && num === 'K');
+  } else if (birthCard && birthCard.code !== 'JK') {
     isBirth = (suit === birthCard.suit && num === birthCard.num);
   } else if (birthCard && birthCard.code === 'JK' && num==='JK') {
     isBirth = true;
@@ -942,7 +959,7 @@ function placePiece(state) {
   const cleared = checkAndClear(state);
   
   state.current = state.next;
-  state.next = spawnPiece();
+  state.next = spawnPiece(state.type === 'king');
   
   const newPos = getPositions(state.current.x, state.current.y, state.current.rot);
   for (const [px,py] of newPos) {
@@ -1144,19 +1161,20 @@ function useJoker() {
 function drawBoard(canvasId, state) {
   const canvas = document.getElementById(canvasId);
   const ctx = canvas.getContext('2d');
-  const W=COLS*CELL, H=ROWS*CELL;
+  const cell = window.DYNAMIC_CELL || CELL;
+  const W=COLS*cell, H=ROWS*cell;
   
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='rgba(0,0,0,0.7)'; ctx.fillRect(0,0,W,H);
   
   // Grid
   ctx.strokeStyle='rgba(201,168,76,0.06)'; ctx.lineWidth=0.5;
-  for(let r=0;r<=ROWS;r++){ctx.beginPath();ctx.moveTo(0,r*CELL);ctx.lineTo(W,r*CELL);ctx.stroke();}
-  for(let c=0;c<=COLS;c++){ctx.beginPath();ctx.moveTo(c*CELL,0);ctx.lineTo(c*CELL,H);ctx.stroke();}
+  for(let r=0;r<=ROWS;r++){ctx.beginPath();ctx.moveTo(0,r*cell);ctx.lineTo(W,r*cell);ctx.stroke();}
+  for(let c=0;c<=COLS;c++){ctx.beginPath();ctx.moveTo(c*cell,0);ctx.lineTo(c*cell,H);ctx.stroke();}
   
   // Board
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) {
-    if(state.board[r][c]) drawCard(ctx,c*CELL,r*CELL,state.board[r][c],false);
+    if(state.board[r][c]) drawCard(ctx,c*cell,r*cell,state.board[r][c],false,cell);
   }
   
   // Current piece
@@ -1169,14 +1187,14 @@ function drawBoard(canvasId, state) {
     while(true){const gp=getPositions(x,gy+1,rot);if(!validPositions(gp,state.board))break;gy++;}
     if(gy!==y){
       const gpos=getPositions(x,gy,rot);
-      gpos.forEach(([px,py],i)=>{if(py>=0)drawGhost(ctx,px*CELL,py*CELL,cards[i]);});
+      gpos.forEach(([px,py],i)=>{if(py>=0)drawGhost(ctx,px*cell,py*cell,cards[i],cell);});
     }
     
-    pos.forEach(([px,py],i)=>{if(py>=0)drawCard(ctx,px*CELL,py*CELL,cards[i],true);});
+    pos.forEach(([px,py],i)=>{if(py>=0)drawCard(ctx,px*cell,py*cell,cards[i],true,cell);});
   }
 }
 
-function drawCard(ctx,x,y,card,active) {
+function drawCard(ctx,x,y,card,active,cell=CELL) {
   if(card.isObstacle) {
     // Obstacle card - dark with skull
     ctx.fillStyle=active?'#1a0a0a':'#120808';
@@ -1228,7 +1246,7 @@ function drawCard(ctx,x,y,card,active) {
   ctx.fillText(isJoker?'★':card.num,x+3,y+2);
 }
 
-function drawGhost(ctx,x,y,card) {
+function drawGhost(ctx,x,y,card,cell=CELL) {
   const color=card.isJoker?'#c080ff':(SUIT_COLOR[card.suit]||'#e8e0d0');
   ctx.strokeStyle=`${color}30`; ctx.lineWidth=1;
   roundRect(ctx,x+1,y+1,CELL-2,CELL-2,5); ctx.stroke();
