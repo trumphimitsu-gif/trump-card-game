@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>トランプの秘密 - カードバトル</title>
+<!-- © トランプの秘密 / くろにゃん All Rights Reserved -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@400;700&display=swap');
 
@@ -42,7 +43,6 @@ body {
                     radial-gradient(ellipse at 70% 90%, rgba(80,60,160,0.04) 0%, transparent 60%);
 }
 
-/* PC対応 */
 @media (min-width: 600px) {
   .controls .ctrl { font-size: 22px; padding: 16px 8px; }
   .ctrl.drop-btn { font-size: 16px; padding: 14px; }
@@ -50,7 +50,6 @@ body {
   .attack-count { font-size: 16px; }
 }
 
-/* ===== START SCREEN ===== */
 #startScreen {
   position: fixed; inset: 0; z-index: 100;
   background: var(--dark);
@@ -169,7 +168,6 @@ body {
   cursor: pointer; text-decoration: underline;
 }
 
-/* ===== HOW TO PLAY OVERLAY ===== */
 #howToPlay {
   display: none; position: fixed; inset: 0; z-index: 200;
   background: rgba(0,0,0,0.92);
@@ -216,11 +214,9 @@ body {
   font-size: 14px; letter-spacing: 1px;
 }
 
-/* ===== GAME SCREEN ===== */
 #gameScreen { display: none; width: 100%; max-width: 420px; padding: 8px; margin: 0 auto; }
 #gameScreen.show { display: block; }
 
-/* PC対応のgameScreen上書き */
 @media (min-width: 600px) {
   #gameScreen { max-width: 700px; }
 }
@@ -250,7 +246,6 @@ body {
 }
 .btn-help:hover { background: rgba(201,168,76,0.2); }
 
-/* Battle area */
 .battle-area {
   display: flex; gap: 6px; margin-bottom: 10px;
   width: 100%; overflow: hidden;
@@ -298,15 +293,15 @@ canvas { display: block; }
 }
 
 .next-card-mini {
-  width: 24px; height: 28px;
+  width: 32px; height: 28px;
   background: rgba(0,0,0,0.6);
   border: 1px solid rgba(201,168,76,0.3);
   border-radius: 4px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px;
+  font-size: 10px;
+  font-family: 'Cinzel', serif;
 }
 
-/* VS divider */
 .vs-divider {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
@@ -321,7 +316,6 @@ canvas { display: block; }
   letter-spacing: 4px;
 }
 
-/* Gauge bars */
 .gauges {
   display: flex; gap: 6px; margin-bottom: 10px;
   padding: 10px 4px;
@@ -352,7 +346,6 @@ canvas { display: block; }
 .gauge-fill.joker { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
 .gauge-fill.attack { background: linear-gradient(90deg, #e05050, #ff8080); }
 
-/* Controls */
 .controls {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
@@ -408,7 +401,6 @@ canvas { display: block; }
   font-family: 'Noto Serif JP', serif;
 }
 
-/* Overlays */
 .board-overlay {
   display: none; position: absolute; inset: 0;
   background: rgba(0,0,0,0.88);
@@ -425,7 +417,6 @@ canvas { display: block; }
 }
 .overlay-sub { font-size: 11px; color: rgba(201,168,76,0.7); text-align: center; }
 
-/* Chain/combo popup */
 .chain-pop {
   position: absolute; top: 40%; left: 50%;
   transform: translate(-50%, -50%);
@@ -449,7 +440,6 @@ canvas { display: block; }
   100% { opacity:0; transform:scale(0.8) rotate(0deg); }
 }
 
-/* Win/Lose screen */
 #resultScreen {
   display: none; position: fixed; inset: 0; z-index: 300;
   background: rgba(0,0,0,0.95);
@@ -487,6 +477,12 @@ canvas { display: block; }
   font-size: 13px; letter-spacing: 1px;
   width: 100%; max-width: 280px;
 }
+
+.copyright {
+  font-size: 9px; color: rgba(201,168,76,0.3);
+  letter-spacing: 1px; margin-top: 16px;
+  text-align: center;
+}
 </style>
 </head>
 <body>
@@ -522,6 +518,7 @@ canvas { display: block; }
   <button class="btn-start" style="margin-top:10px;background:linear-gradient(135deg,rgba(100,100,120,0.5),rgba(60,60,80,0.5));color:rgba(201,168,76,0.4);box-shadow:none;cursor:not-allowed;border:1px solid rgba(201,168,76,0.2);" disabled>
     友達と対戦<span style="font-size:10px;margin-left:8px;background:rgba(201,168,76,0.2);padding:2px 8px;border-radius:10px;color:rgba(201,168,76,0.6);">準備中</span>
   </button>
+  <div class="copyright">© トランプの秘密 / くろにゃん All Rights Reserved</div>
 </div>
 
 <!-- HOW TO PLAY -->
@@ -565,7 +562,6 @@ canvas { display: block; }
     </div>
   </div>
 
-  <!-- Kuronyan animation overlay -->
   <div id="kuronyanOverlay" style="display:none;position:fixed;inset:0;z-index:50;pointer-events:none;align-items:center;justify-content:center;">
     <div id="kuronyanAnim" style="font-size:80px;animation:kuronyanPop 1.5s ease-out forwards;">🐈‍⬛</div>
   </div>
@@ -613,7 +609,7 @@ canvas { display: block; }
   <!-- Gauges -->
   <div class="gauges">
     <div class="gauge-item">
-      <div class="gauge-label" id="kingGaugeLabel" style="font-size:11px;color:rgba(201,168,76,0.9);font-weight:700;">👑 KING</div>
+      <div class="gauge-label" id="kingGaugeLabel" style="font-size:11px;color:rgba(201,168,76,0.9);font-weight:700;">Age-1 [A♥] KING</div>
       <div class="gauge-bar"><div class="gauge-fill attack" id="kingJokerGauge"></div></div>
     </div>
     <div class="gauge-item">
@@ -622,16 +618,16 @@ canvas { display: block; }
     </div>
   </div>
 
-  <!-- Controls: 左移動 / ⏸一時停止 / 💥おじゃま / ↻回転 / 右移動 -->
+  <!-- Controls -->
   <div class="controls">
-    <button class="ctrl" id="btnLeft" onclick="moveLeft()">◀</button>
+    <button class="ctrl" id="btnLeft">◀</button>
     <button class="ctrl" id="pauseBtn" onclick="togglePause()">⏸</button>
     <button class="ctrl attack-btn" id="btnAttack" onclick="sendAttack()">
       💥
       <span class="attack-count" id="attackCount">0</span>
     </button>
     <button class="ctrl" id="btnRotate" onclick="rotate()">↻</button>
-    <button class="ctrl" id="btnRight" onclick="moveRight()">▶</button>
+    <button class="ctrl" id="btnRight">▶</button>
     <button class="ctrl drop-btn drop-row" ontouchstart="startFast()" ontouchend="stopFast()" onmousedown="startFast()" onmouseup="stopFast()">▼ 落とす（長押し）</button>
   </div>
 </div>
@@ -647,13 +643,12 @@ canvas { display: block; }
 </div>
 
 <script>
-// ========== CONSTANTS ==========
+// © トランプの秘密 / くろにゃん All Rights Reserved
 const COLS = 6, ROWS = 11;
 const SUITS = ['♥','♣','♦','♠'];
 const SUIT_COLOR = {'♥':'#e05050','♦':'#e05050','♣':'#d8d0c0','♠':'#d8d0c0'};
 const NUMS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 
-// Birth card table (abbreviated - key dates)
 const BIRTH_TABLE = {
   '1/1':'KS','1/2':'QS','1/3':'JS','1/4':'10S','1/5':'9S','1/6':'8S','1/7':'7S','1/8':'6S','1/9':'5S','1/10':'4S','1/11':'3S','1/12':'2S','1/13':'AS','1/14':'KD','1/15':'QD','1/16':'JD','1/17':'10D','1/18':'9D','1/19':'8D','1/20':'7D','1/21':'6D','1/22':'5D','1/23':'4D','1/24':'3D','1/25':'2D','1/26':'AD','1/27':'KC','1/28':'QC','1/29':'JC','1/30':'10C','1/31':'9C',
   '2/1':'JS','2/2':'10S','2/3':'9S','2/4':'8S','2/5':'7S','2/6':'6S','2/7':'5S','2/8':'4S','2/9':'3S','2/10':'2S','2/11':'AS','2/12':'KD','2/13':'QD','2/14':'JD','2/15':'10D','2/16':'9D','2/17':'8D','2/18':'7D','2/19':'6D','2/20':'5D','2/21':'4D','2/22':'3D','2/23':'2D','2/24':'AD','2/25':'KC','2/26':'QC','2/27':'JC','2/28':'10C','2/29':'9C',
@@ -673,13 +668,12 @@ const CARD_DESC = {
   H:'愛のカード', C:'知恵のカード', D:'価値のカード', S:'変革のカード', JK:'鏡のカード'
 };
 
-// ========== STATE ==========
-let birthCard = null; // {suit, num, code}
+let birthCard = null;
 let playerState = null;
 let kingState = null;
 let gameRunning = false;
-let jokerGauge = 0; // 0-100
-let attackStock = 0; // 0-10
+let jokerGauge = 0;
+let attackStock = 0;
 let fastFalling = false;
 let fastTimer = null;
 let gameLoopTimer = null;
@@ -709,9 +703,7 @@ function showKuronyan() {
   setTimeout(() => { overlay.style.display = 'none'; }, 1500);
 }
 
-// ========== CANVAS SETUP ==========
 function setupCanvas() {
-  const gameScreen = document.getElementById('gameScreen');
   const screenW = Math.min(window.innerWidth, 700);
   const padding = 16;
   const vsWidth = 36;
@@ -726,7 +718,6 @@ function setupCanvas() {
   });
 }
 
-// ========== BIRTH CARD ==========
 function setBirth() {
   const m = parseInt(document.getElementById('bMonth').value);
   const d = parseInt(document.getElementById('bDay').value);
@@ -748,15 +739,9 @@ function setBirth() {
   document.getElementById('birthResultCard').textContent = `${num}${suit}`;
   document.getElementById('birthResultDesc').textContent = 'あなたのカード ✦ 3枚揃えでポイント3倍！';
   document.getElementById('birthResult').classList.add('show');
-  
-  // Update game badge if game is running
-  const badge = document.getElementById('birthBadge');
-  if (badge) { badge.textContent = `${num}${suit}`; badge.style.display='block'; }
 }
 
-// ========== GAME INIT ==========
 function startGame(mode='king') {
-  // Save name and birth to localStorage
   const nameInput = document.getElementById('playerName').value.trim();
   const name = nameInput ? nameInput.toUpperCase() : 'PLAYER';
   if (nameInput) localStorage.setItem('trump_name', nameInput);
@@ -767,17 +752,26 @@ function startGame(mode='king') {
 
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('gameScreen').classList.add('show');
-  
-  // Update gauge labels with birth card + names
-  const birthStr = birthCard ? `${birthCard.num}${birthCard.suit} ` : '';
-  document.getElementById('selfGaugeLabel').innerHTML = `<span style="color:#ffd850;font-weight:900;">${birthStr}</span><span style="color:#f0d080;font-weight:700;">${name}</span>`;
-  document.getElementById('kingGaugeLabel').innerHTML = `<span style="color:#f0d080;font-weight:700;">👑 KING</span>`;
-  
+
+  // インジケーター更新
+  const birthStr = birthCard ? `${birthCard.num}${birthCard.suit}` : '??';
+  document.getElementById('selfGaugeLabel').innerHTML =
+    `<span style="color:#ffd850;font-weight:900;">[${birthStr}] </span><span style="color:#f0d080;font-weight:700;">${name}</span>`;
+  document.getElementById('kingGaugeLabel').innerHTML =
+    `<span style="color:#f0d080;font-weight:700;">Age-1 [A♥] KING</span>`;
+
   setupCanvas();
+
+  // 初回のみ遊び方を表示
+  const hasSeenHelp = localStorage.getItem('trump_seen_help');
+  if (!hasSeenHelp) {
+    localStorage.setItem('trump_seen_help', '1');
+    setTimeout(() => openHelp(), 300);
+  }
+
   initGame();
 }
 
-// Load saved data on page load
 window.addEventListener('load', () => {
   const savedName = localStorage.getItem('trump_name');
   const savedMonth = localStorage.getItem('trump_birth_month');
@@ -789,6 +783,17 @@ window.addEventListener('load', () => {
     document.getElementById('bDay').value = savedDay;
     setBirth();
   }
+
+  // 左右ボタンのズームバグ修正（touchstart）
+  document.getElementById('btnLeft').addEventListener('touchstart', e => {
+    e.preventDefault(); moveLeft();
+  }, {passive: false});
+  document.getElementById('btnRight').addEventListener('touchstart', e => {
+    e.preventDefault(); moveRight();
+  }, {passive: false});
+  document.getElementById('btnRotate').addEventListener('touchstart', e => {
+    e.preventDefault(); rotate();
+  }, {passive: false});
 });
 
 function initGame() {
@@ -833,17 +838,13 @@ function spawnPiece(forKing=false) {
 
 function randomCard(isObstacle=false, forKing=false) {
   if (isObstacle) return {suit:'👿', num:'★', isObstacle:true};
-  
-  // Small chance of joker
   if (Math.random() < 0.05) return {suit:'🃏', num:'JK', isJoker:true};
   
   const suit = SUITS[Math.floor(Math.random()*SUITS.length)];
   const num = NUMS[Math.floor(Math.random()*NUMS.length)];
   
-  // Birth card glow
   let isBirth = false;
   if (forKing) {
-    // KINGのバースカードは♠️K（1/1生まれ）
     isBirth = (suit === '♠' && num === 'K');
   } else if (birthCard && birthCard.code !== 'JK') {
     isBirth = (suit === birthCard.suit && num === birthCard.num);
@@ -854,24 +855,17 @@ function randomCard(isObstacle=false, forKing=false) {
   return {suit, num, isBirth};
 }
 
-// ========== GAME LOOP ==========
 function gameLoop() {
   if (!gameRunning || helpOpen || paused) return;
   
-  // Player step
   if (!playerState.dead) {
-    if (!moveDown(playerState)) {
-      placePiece(playerState);
-    }
+    if (!moveDown(playerState)) placePiece(playerState);
     drawBoard('playerCanvas', playerState);
   }
   
-  // King AI step
   if (!kingState.dead) {
     kingAI();
-    if (!moveDown(kingState)) {
-      placePiece(kingState);
-    }
+    if (!moveDown(kingState)) placePiece(kingState);
     drawBoard('kingCanvas', kingState);
   }
   
@@ -880,7 +874,6 @@ function gameLoop() {
 }
 
 function kingAI() {
-  // Simple AI: occasionally rotate and move
   if (Math.random() < 0.3) {
     const newRot = (kingState.current.rot + 1) % 4;
     const pos = getPositions(kingState.current.x, kingState.current.y, newRot);
@@ -894,7 +887,6 @@ function kingAI() {
   }
 }
 
-// ========== PIECE MOVEMENT ==========
 function getPositions(x, y, rot) {
   if (rot===0) return [[x,y],[x,y+1]];
   if (rot===1) return [[x,y],[x+1,y]];
@@ -941,7 +933,6 @@ function rotate() {
   if (!gameRunning || playerState.dead) return;
   const newRot = (playerState.current.rot+1)%4;
   let nx = playerState.current.x;
-  // Adjust x if horizontal rotation would go out of bounds
   if (newRot===1 || newRot===3) {
     if (nx+1 >= COLS) nx = COLS-2;
   }
@@ -956,7 +947,6 @@ function rotate() {
 function startFast() { fastFalling=true; fastTimer=setInterval(()=>{ if(!moveDown(playerState)){placePiece(playerState);stopFast();} else drawBoard('playerCanvas',playerState); },60); }
 function stopFast() { fastFalling=false; clearInterval(fastTimer); }
 
-// ========== PLACE & CLEAR ==========
 function placePiece(state) {
   const {x,y,cards,rot} = state.current;
   const pos = getPositions(x,y,rot);
@@ -997,7 +987,6 @@ function applyGravity(board) {
 function checkAndClear(state) {
   const toDelete = new Set();
   
-  // Suit flood fill (4+)
   for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
     if (!state.board[r][c] || state.board[r][c].isObstacle) continue;
     const card = state.board[r][c];
@@ -1007,7 +996,6 @@ function checkAndClear(state) {
     if (group.length>=4) group.forEach(([gr,gc])=>toDelete.add(`${gr},${gc}`));
   }
   
-  // Number vertical (3+)
   for (let c=0;c<COLS;c++) {
     let streak=[], lastNum=null;
     for (let r=0;r<ROWS;r++) {
@@ -1023,7 +1011,6 @@ function checkAndClear(state) {
     }
   }
   
-  // Birth card bonus (3+)
   if (birthCard && state.type==='player') {
     const bGroup = [];
     for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) {
@@ -1039,7 +1026,6 @@ function checkAndClear(state) {
   
   if (toDelete.size===0) return false;
   
-  // Obstacle chain clear
   const obstacleCheck = new Set();
   toDelete.forEach(key=>{
     const [r,c]=key.split(',').map(Number);
@@ -1054,20 +1040,17 @@ function checkAndClear(state) {
   const baseScore = toDelete.size * 100;
   state.score += baseScore;
   
-  // Gauge update (player only)
   if (state.type==='player') {
     const prevGauge = jokerGauge;
     jokerGauge = Math.min(100, jokerGauge + toDelete.size * 8);
-    // Attack stock increases when gauge fills completely, then resets
     if (prevGauge < 100 && jokerGauge >= 100) {
       attackStock = Math.min(10, attackStock + 1);
-      jokerGauge = 0; // reset to refill again
+      jokerGauge = 0;
     }
     updateGauges();
     updateAttackBtn();
     if (toDelete.size>=8) showChain('playerChain', `${toDelete.size}枚消去！`);
   } else {
-    // Update king's gauge
     kingJokerGaugeVal = Math.min(100, kingJokerGaugeVal + toDelete.size * 8);
     updateGauges();
   }
@@ -1108,8 +1091,7 @@ function floodFill(row, col, board, mode) {
   return result;
 }
 
-// ========== GAUGES & BUTTONS ==========
-let kingJokerGaugeVal = 0; // king's gauge 0-100
+let kingJokerGaugeVal = 0;
 
 function updateGauges() {
   document.getElementById('jokerGauge').style.width = jokerGauge+'%';
@@ -1128,7 +1110,6 @@ function sendAttack() {
   attackStock = 0;
   updateGauges(); updateAttackBtn();
   
-  // Add obstacle cards to king's board
   let added=0;
   for(let i=0;i<count&&added<count;i++) {
     const col = Math.floor(Math.random()*COLS);
@@ -1147,11 +1128,7 @@ function sendAttack() {
 function useJoker() {
   if (jokerGauge<100 || kingState.dead) return;
   jokerGauge=0;
-  
-  // Show kuronyan animation
   showKuronyan();
-  
-  // Send 3 obstacles to king
   for(let i=0;i<3;i++) {
     const col=Math.floor(Math.random()*COLS);
     for(let r=ROWS-1;r>=0;r--) {
@@ -1168,7 +1145,6 @@ function useJoker() {
   drawBoard('kingCanvas',kingState);
 }
 
-// ========== DRAWING ==========
 function drawBoard(canvasId, state) {
   const canvas = document.getElementById(canvasId);
   const ctx = canvas.getContext('2d');
@@ -1178,22 +1154,18 @@ function drawBoard(canvasId, state) {
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='rgba(0,0,0,0.7)'; ctx.fillRect(0,0,W,H);
   
-  // Grid
   ctx.strokeStyle='rgba(201,168,76,0.06)'; ctx.lineWidth=0.5;
   for(let r=0;r<=ROWS;r++){ctx.beginPath();ctx.moveTo(0,r*cell);ctx.lineTo(W,r*cell);ctx.stroke();}
   for(let c=0;c<=COLS;c++){ctx.beginPath();ctx.moveTo(c*cell,0);ctx.lineTo(c*cell,H);ctx.stroke();}
   
-  // Board
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) {
     if(state.board[r][c]) drawCard(ctx,c*cell,r*cell,state.board[r][c],false,cell);
   }
   
-  // Current piece
   if(state.current && !state.dead) {
     const {x,y,cards,rot}=state.current;
     const pos=getPositions(x,y,rot);
     
-    // Ghost
     let gy=y;
     while(true){const gp=getPositions(x,gy+1,rot);if(!validPositions(gp,state.board))break;gy++;}
     if(gy!==y){
@@ -1222,11 +1194,9 @@ function drawCard(ctx,x,y,card,active,cell=CELL) {
   const isBirth=card.isBirth;
   const isJoker=card.isJoker;
   
-  // Background
   ctx.fillStyle=active?(isBirth?'#1e1a08':isJoker?'#0a0a1e':'#1a1a2a'):(isBirth?'#16140a':'#10101a');
   roundRect(ctx,x+1,y+1,cell-2,cell-2,5); ctx.fill();
   
-  // Border
   if(isBirth){
     ctx.strokeStyle=`rgba(255,220,80,${active?1:0.7})`;
     ctx.lineWidth=active?2:1.5;
@@ -1240,7 +1210,6 @@ function drawCard(ctx,x,y,card,active,cell=CELL) {
   }
   ctx.shadowBlur=0;
   
-  // Suit symbol (center, larger)
   ctx.font=`bold ${cell*0.55}px serif`;
   ctx.textAlign='center'; ctx.textBaseline='middle';
   if(isBirth&&active){ctx.shadowColor='rgba(255,220,80,0.9)';ctx.shadowBlur=12;}
@@ -1248,7 +1217,6 @@ function drawCard(ctx,x,y,card,active,cell=CELL) {
   ctx.fillText(isJoker?'🃏':card.suit,x+cell/2,y+cell/2+2);
   ctx.shadowBlur=0;
   
-  // Number (large, overlapping suit is OK)
   ctx.font=`bold ${cell*0.38}px 'Cinzel',serif`;
   ctx.textAlign='left'; ctx.textBaseline='top';
   ctx.fillStyle=isBirth?'#ffd850':(isJoker?'#c080ff':color);
@@ -1278,13 +1246,19 @@ function renderNext(id, piece) {
   piece.cards.forEach(card=>{
     const d=document.createElement('div');
     d.className='next-card-mini';
-    d.textContent=card.isJoker?'🃏':(card.isObstacle?'👿':card.suit);
-    d.style.color=card.isJoker?'#c080ff':(SUIT_COLOR[card.suit]||'#e8e0d0');
+    if(card.isObstacle){
+      d.textContent='👿';
+    } else if(card.isJoker){
+      d.textContent='JK';
+      d.style.color='#c080ff';
+    } else {
+      d.textContent=`${card.num}${card.suit}`;
+      d.style.color=SUIT_COLOR[card.suit]||'#e8e0d0';
+    }
     el.appendChild(d);
   });
 }
 
-// ========== END GAME ==========
 function endGame(state) {
   state.dead=true;
   const overlayId=state.type==='player'?'playerOverlay':'kingOverlay';
@@ -1319,7 +1293,6 @@ function showChain(id, text) {
   setTimeout(()=>{el.className='chain-pop';},1300);
 }
 
-// ========== UI ==========
 function openHelp() {
   helpOpen=true;
   document.getElementById('howToPlay').classList.add('show');
@@ -1345,7 +1318,6 @@ function goMenu() {
   clearInterval(gameLoopTimer);
 }
 
-// ========== KEYBOARD ==========
 document.addEventListener('keydown',e=>{
   if(!gameRunning||helpOpen) return;
   if(e.key==='ArrowLeft') moveLeft();
