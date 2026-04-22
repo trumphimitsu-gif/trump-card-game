@@ -514,11 +514,11 @@ canvas { display: block; }
     </div>
   </div>
 
-  <button class="btn-start" onclick="startGame('king')">KINGに挑む</button>
+  <button class="btn-start" onclick="startGame('king')">AI KINGに挑む</button>
   <button class="btn-start" style="margin-top:10px;background:linear-gradient(135deg,rgba(100,100,120,0.5),rgba(60,60,80,0.5));color:rgba(201,168,76,0.4);box-shadow:none;cursor:not-allowed;border:1px solid rgba(201,168,76,0.2);" disabled>
     友達と対戦<span style="font-size:10px;margin-left:8px;background:rgba(201,168,76,0.2);padding:2px 8px;border-radius:10px;color:rgba(201,168,76,0.6);">準備中</span>
   </button>
-  <div class="copyright">© トランプの秘密 / くろにゃん All Rights Reserved</div>
+  <div class="copyright">© トランプの秘密 All Rights Reserved</div>
 </div>
 
 <!-- HOW TO PLAY -->
@@ -643,7 +643,7 @@ canvas { display: block; }
 </div>
 
 <script>
-// © トランプの秘密 / くろにゃん All Rights Reserved
+// © トランプの秘密 All Rights Reserved
 const COLS = 6, ROWS = 11;
 const SUITS = ['♥','♣','♦','♠'];
 const SUIT_COLOR = {'♥':'#e05050','♦':'#e05050','♣':'#d8d0c0','♠':'#d8d0c0'};
@@ -1276,8 +1276,8 @@ function endGame(state) {
     titleEl.className = 'result-title ' + (playerWon ? 'win' : 'lose');
     document.getElementById('resultScore').textContent = `スコア: ${playerState.score.toLocaleString()}`;
     document.getElementById('resultMsg').textContent = playerWon ?
-      'やったにゃ！\nKINGを倒したにゃ！🎩' :
-      'KINGには勝てなかった…\nもう一度挑戦するにゃ🎩';
+      'やったにゃ！\nAI KINGを倒したにゃ！🎩' :
+      'AI KINGには勝てなかった…\nもう一度挑戦するにゃ🎩';
     
     setTimeout(()=>{
       document.getElementById('resultScreen').classList.add('show');
